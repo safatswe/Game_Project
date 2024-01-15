@@ -32,8 +32,7 @@ void renderFood(SDL_Renderer* renderer, SDL_Rect food) {
 }
 
 void renderScore(SDL_Renderer* renderer, int tailLength, int scale, int wScale) {
-    // Dummy function since SDL_ttf is not included
-    // You can replace this function with your custom rendering logic if needed
+    
 }
 
 bool checkCollision(int foodx, int foody, int playerx, int playery) {
@@ -69,17 +68,15 @@ pair<int, int> getFoodSpawn(vector<int> tailX, vector<int> tailY, int playerX, i
 }
 
 void gameOver(SDL_Renderer* renderer, int scale, int wScale, int tailLength) {
-    // Dummy function since SDL_ttf is not included
-    // You can replace this function with your custom rendering logic if needed
+    
     cout << "Game Over!" << endl;
 
     // Reset the game state
-    SDL_Delay(2000); // Wait for 2 seconds before resetting (for visibility)
+    SDL_Delay(2000); 
 }
 
 void youWin(SDL_Renderer* renderer, SDL_Event event, int scale, int wScale, int tailLength) {
-    // Dummy function since SDL_ttf is not included
-    // You can replace this function with your custom rendering logic if needed
+    
 }
 
 int main(int argc, char* argv[]) {
@@ -318,16 +315,10 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        // Render everything
         renderFood(renderer, food);
         renderPlayer(renderer, player, x, y, scale, tailX, tailY, tailLength);
         renderScore(renderer, tailLength, scale, wScale);
-
-        // Put everything on screen
         SDL_RenderPresent(renderer);
-
-        // Choose a color and fill the entire window with it, this resets everything before the next frame
-        // This also gives us the background color
         SDL_SetRenderDrawColor(renderer, 105, 105, 105, 255);
         SDL_RenderClear(renderer);
     }
