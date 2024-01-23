@@ -7,6 +7,10 @@
 
 #undef main
 
+int c=0;
+int score=0;
+SDL_Renderer* renderer;
+
 using namespace std;
 
 void renderPlayer(SDL_Renderer* renderer, SDL_Rect player, int x, int y, int scale, vector<int> tailX, vector<int> tailY, int tailLength) {
@@ -82,20 +86,65 @@ pair<int, int> getFoodSpawn(vector<int> tailX, vector<int> tailY, int playerX, i
 
     return foodLoc;
 }
+void renderScore() {
+	SDL_Color yellow= { 255, 255, 0 };
+
+	TTF_Font* font = TTF_OpenFont((char*)"score.ttf", 16);
+	if (font == NULL) {
+		cout << "Font loading error" << SDL_GetError() << endl;
+		return;
+	}
+
+	SDL_Surface* s = TTF_RenderText_Solid(font, (string("Score: ") + to_string(score+c)).c_str(), yellow);
+	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, s);
+	SDL_Rect scoreRect;
+	scoreRect.w = 150;
+	scoreRect.h = 50;
+	scoreRect.x = ((24*24) / 2) - (scoreRect.w / 2);
+	scoreRect.y = 0;
+	SDL_RenderCopy(renderer, Message, NULL, &scoreRect);
+
+	TTF_CloseFont(font);
+}
+
+   void rendergameover() {
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+    SDL_RenderClear(renderer);
+	SDL_Color w= { 255,255,255 };
+
+	TTF_Font* font = TTF_OpenFont((char*)"score.ttf", 25);
+	if (font == NULL) {
+		cout << "Font loading error" << SDL_GetError() << endl;
+		return;
+	}
+  string text ="GAME OVER !";
+	SDL_Surface* g = TTF_RenderText_Solid(font,text.c_str(), w);
+	SDL_Texture* Message = SDL_CreateTextureFromSurface(renderer, g);
+	SDL_Rect scoreRect;
+	scoreRect.w = 300;
+	scoreRect.h = 150;
+	scoreRect.x = ((24*24) / 2)-(scoreRect.w / 2) ;
+	scoreRect.y =  ((24*24) / 2)-(scoreRect.h / 2);
+	SDL_RenderCopy(renderer, Message, NULL, &scoreRect);
+    SDL_RenderPresent(renderer);
+    SDL_Delay(2000);
+
+	TTF_CloseFont(font);
+}
 
 
 
 int main(int argc, char* argv[]) {
-
+    float btime,newbtime;
     int t=0;
-    int c=0;
-    int score=0;
+    
     
     bool redox=false;
     SDL_Init(SDL_INIT_EVERYTHING);
+    TTF_Init();
 
     SDL_Window* window;
-    SDL_Renderer* renderer;
+    
     SDL_Event event;
 
     SDL_Rect player;
@@ -181,8 +230,12 @@ int main(int argc, char* argv[]) {
             SDL_RenderFillRect(renderer, &obstacl);
             SDL_RenderFillRect(renderer, &obstacll);
 
-
-        float newTime = SDL_GetTicks() / 100; 
+            newbtime = SDL_GetTicks();
+            if (newbtime-btime >= 5000){
+                bonusfood.x = 3000;
+                bonusfood.y = 5000;
+            }
+        float newTime = SDL_GetTicks()/ 100; 
         float delta = newTime - time;
         time = newTime;
 
@@ -287,7 +340,8 @@ int main(int argc, char* argv[]) {
             }
 
             if(c%3==0)
-            {   foodLoc = getFoodSpawn(tailX, tailY, x, y, scale, wScale, tailLength);
+            {  btime=SDL_GetTicks();
+                 foodLoc = getFoodSpawn(tailX, tailY, x, y, scale, wScale, tailLength);
             bonusfood.x = foodLoc.first;
             bonusfood.y = foodLoc.second;
 
@@ -303,6 +357,7 @@ int main(int argc, char* argv[]) {
 
 
      if (redox == true) {
+        btime=SDL_GetTicks();
             redox = false;
             foodLoc = getFoodSpawn(tailX, tailY, x, y, scale, wScale, tailLength);
             bonusfood.x = foodLoc.first;
@@ -377,17 +432,19 @@ int main(int argc, char* argv[]) {
 
          if(flag==1)
          break;
-   
-
+    renderScore();
     renderFood(renderer, food);
     renderbonusFood(renderer,bonusfood);
     renderPlayer(renderer, player, x, y, scale, tailX, tailY, tailLength);
-   SDL_RenderPresent(renderer);
+    SDL_RenderPresent(renderer);
+    
     SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
     SDL_RenderClear(renderer);
-    }
+    } rendergameover();
+     SDL_Delay(1000);
+
    std:: cout <<"GAME OVER!"<<endl;
-   std:: cout <<"TOTAL SCORE :"<<c+score;
+   std:: cout <<"TOTAL SCORE :"<< c+score;
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
